@@ -3,6 +3,8 @@ I am too lazy to sort my mail by hand, so I scripted this tool to do it for me.
 It can be used as a daemon to add ocr information to scanned pdfs in a specific folder
 and to sort the pdfs according to predefined keywords.
 
+**This is still a work in progress and is not usable yet.**
+
 ## Disclaimer
 This is just a private project. Please back up your data regularly. I cannot guarantee that some bugs or misusage corrupt or delete your data.
 
