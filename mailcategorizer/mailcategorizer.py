@@ -1,5 +1,7 @@
+import sys
 import ocrmypdf
 import configparser
+import yaml
 from datetime import datetime
 import PyPDF2
 import re
@@ -61,8 +63,10 @@ def categorize_files(files, categories):
       # Check if all keywords are in pdf
       all_keywords_in_pdf = True
       for keyword in category.keywords:
-        if not re.search(keyword, pdf_text, re.IGNORECASE):
+        in_pdf = re.search(keyword, pdf_text, re.IGNORECASE)
+        if not in_pdf:
           all_keywords_in_pdf = False
+          break
       if all_keywords_in_pdf:
         if len(in_category) > 0:
           # File is already categorized, therefore it gets saved in 
@@ -93,37 +97,39 @@ def read_config(filepath):
       filepath (string): Path to the configfile
 
   Returns:
+      string: Folder where the scans can be found
+      string: Folder where the scans should be sorted
       list: List of all defined categories
   """
+  with open(filepath, "r") as ymlfile:
+    config = yaml.safe_load(ymlfile)
+  scanning_folder = config["scanning_folder"]
+  sorting_folder = config["sorting_folder"]
   categories = []
-  config = configparser.ConfigParser()
-  config.read("/home/sandro/workspace/pdfsort/config.ini")
-  config = config["CATEGORIES"]
-  for key in config:
-    keywords = config[key].split(" ")
-    categories.append(Category(key, keywords))
-  return categories
+  for key in config["categories"]:
+    categories.append(Category(key, re.split("; ", config["categories"][key])))
+  return scanning_folder, sorting_folder, categories
 
-def move_files_into_categories(categories):
+def move_files_into_categories(sorting_folder, categories):
   """Moves files into their category folders. 
      Alters filenames to timestamps.
 
   Args:
+      sorting_folder (string): Folder to sort the pdfs into
       categories (list): List of all categories and their files
   """
   for category in categories:
-    if not os.path.isdir(category.foldername):
-      os.makedirs(category.foldername)
+    category_folder = os.path.join(sorting_folder, category.foldername)
+    if not os.path.isdir(category_folder):
+      os.makedirs(category_folder)
     for file in category.files:
-      path = os.path.split(file)[0]
-      new_file = os.path.join(path, "..", 
-                              category.foldername, 
+      new_file = os.path.join(category_folder, 
                               datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f.pdf"))
       os.rename(file, new_file)
 
 
 class Category():
-    def __init__(self, foldername, keywords = [], files = []):
+    def __init__(self, foldername, keywords = None, files = None):
       """Class, which can save the foldername, keywords and the 
          files belonging to a category
 
@@ -135,12 +141,32 @@ class Category():
       """
       
       self.foldername = foldername
-      self.keywords = keywords
-      self.files = files
+      # We cannot use an empty list as default argument, because Python re-uses 
+      # the same list for each generated instance of the object
+      if keywords is not None:
+        self.keywords = keywords
+      else:
+        self.keywords = []
+      if files is not None:
+        self.files = files
+      else:
+        self.files = []
 
-if __name__ == '__main__':
-  files = find_pdf_files("unsorted/")
+def main():
+  if len(sys.argv) < 2:
+    print("You must specify the location of the config file.")
+    sys.exit()
+  if len(sys.argv) > 2:
+    print("Expected path to config file, got too many arguments.")
+    sys.exit()
+  if not os.path.exists(sys.argv[1]):
+    print("Cannot open configuration file, is your provided path correct?")
+    sys.exit()
+  scanning_folder, sorting_folder, categories = read_config(sys.argv[1])
+  files = find_pdf_files(scanning_folder)
   #ocr_files(files)
-  categories = read_config("config.ini")
   categorize_files(files, categories)
-  move_files_into_categories(categories)
+  move_files_into_categories(sorting_folder, categories)
+
+if __name__ == "__main__":
+  main()
