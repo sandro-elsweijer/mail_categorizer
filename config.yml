@@ -1,0 +1,6 @@
+scanning_folder: ~/mail_categorizer/scans
+sorting_folder: ~/mail_categorizer/categorized
+
+categories:
+  my_health_insurance: company name; your insurance id
+  my bank: bank name
