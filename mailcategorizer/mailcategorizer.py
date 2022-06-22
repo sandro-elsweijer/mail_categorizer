@@ -1,6 +1,5 @@
 import sys
 import ocrmypdf
-import configparser
 import yaml
 from datetime import datetime
 import PyPDF2
@@ -164,7 +163,7 @@ def main():
     sys.exit()
   scanning_folder, sorting_folder, categories = read_config(sys.argv[1])
   files = find_pdf_files(scanning_folder)
-  #ocr_files(files)
+  ocr_files(files)
   categorize_files(files, categories)
   move_files_into_categories(sorting_folder, categories)
 
