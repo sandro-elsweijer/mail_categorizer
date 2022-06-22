@@ -1,15 +1,36 @@
 # Mail categorizer
-I am too lazy to sort my mail by hand, so I automated it.
-It can be used as a daemon to add ocr information to scanned pdfs in a specific folder
+I am too lazy to sort my scanned mail by hand, so I automated it.
+It can be used as a cron job to add ocr information to scanned pdfs in a specific folder
 and to sort the pdfs according to predefined keywords.
-
-**This is still a work in progress and is not usable yet.**
 
 ## Disclaimer
 This is just a private project. Please back up your data regularly. I cannot guarantee that some bugs or misusage corrupt or delete your data.
 
-## Usage
-Define categories in the `config.ini`. The category is used as the folder name for the categorized pdfs. The script will search for each space-separated keyword inside each pdf and categorize the pdfs according to the occurring keywords in the pdf. The script will save each uncategorizable in a
-`no_match` or a `multiple_matches` folder. If a pdf appears in there you have to tweak your keywords.
+## Installation
 
-Run the python script and specify the folder with the uncategorized mail scans (e.g. where your scanner saves them automatically) and the location of your `config.ini`.
+The package needs `tesseract-ocr` to be installed:
+```
+sudo apt-get install tesseract-ocr
+```
+
+To install the mailcategorizer we execute:
+```
+git clone git@github.com:sandro-elsweijer/mailcategorizer.git
+cd mail_categorizer
+pip install .
+```
+
+## Usage
+We can define the directory, where the scan pdfs are located in the `config.yml`.
+We also define, into which folder the files should be sorted.
+
+Lastly, we define the categories for our pdfs. The key value is the name of the folder the pdfs of this category get sorted into. The value is a semicolon-separated list of all keywords, which have to appear in the pdf.
+
+pdfs which match in multiple categories are saved into a dedicated `multiple_matches` folder. pdfs with no match are saved into the `no_matches` folder.
+
+When calling the mailcategorizer, we have to provide it with the location of the config file:
+```
+mailcategorizer path/to/config.yml
+```
+
+I suggest to automate this process with a cron job, so every time a document is scanned, it gets sorted automatically.
