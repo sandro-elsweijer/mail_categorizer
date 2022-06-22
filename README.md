@@ -1,4 +1,4 @@
-# Mail categorizer
+# mailcategorizer
 I am too lazy to sort my scanned mail by hand, so I automated it.
 It can be used as a cron job to add ocr information to scanned pdfs in a specific folder
 and to sort the pdfs according to predefined keywords.
@@ -16,7 +16,7 @@ sudo apt-get install tesseract-ocr
 To install the mailcategorizer we execute:
 ```
 git clone git@github.com:sandro-elsweijer/mailcategorizer.git
-cd mail_categorizer
+cd mailcategorizer
 pip install .
 ```
 
