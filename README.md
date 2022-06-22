@@ -1,5 +1,5 @@
 # Mail categorizer
-I am too lazy to sort my mail by hand, so I scripted this tool to do it for me.
+I am too lazy to sort my mail by hand, so I automated it.
 It can be used as a daemon to add ocr information to scanned pdfs in a specific folder
 and to sort the pdfs according to predefined keywords.
 
